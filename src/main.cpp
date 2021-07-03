@@ -4,7 +4,7 @@
 void setup() {
   Serial.begin(9600);         // Start the Serial communication to send messages to the computer
   
-  // pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
+  pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
   
   delay(10);
   Serial.println('\n');
@@ -12,14 +12,15 @@ void setup() {
   WiFi.begin(ssid, password);             // Connect to the network
   Serial.print("Connecting to ");
 
-  // digitalWrite(LED_BUILTIN, HIGH);
-
   Serial.print(ssid); Serial.println(" ...");
 }
 
 bool isConnectionNotifiactionPrinted;
+bool isLedOn = true;
 unsigned long previousMillis = 0;
 int i = 0;
+const uint8_t OFF = HIGH;
+const uint8_t ON = LOW;
 
 void loop() { 
   unsigned long currentMillis = millis();
@@ -29,9 +30,19 @@ void loop() {
     if (currentMillis - previousMillis >= 1000) {
       previousMillis = currentMillis;
       Serial.print(++i); Serial.print(' ');
+
+      if (isLedOn) {
+        isLedOn = false;
+        digitalWrite(LED_BUILTIN, OFF);
+      } else {
+        isLedOn = true;
+        digitalWrite(LED_BUILTIN, ON);
+      }
     }
   } else {
     if (!isConnectionNotifiactionPrinted) {
+      isLedOn = false;
+      digitalWrite(LED_BUILTIN, OFF);
       i = 0;
       isConnectionNotifiactionPrinted = true;
 
