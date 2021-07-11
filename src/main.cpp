@@ -90,7 +90,13 @@ void onButtonPush() {
   int httpCode = http.POST(""); 
   String payload = http.getString();
 
-  Serial.print("Got response: "); Serial.print(httpCode); Serial.println(payload);
+  if (httpCode != 200) {
+    isRedLedOn = turnOnLed(redLed);
+  } else {
+    isRedLedOn = turnOffLed(redLed);
+  }
+
+  Serial.print("Got response: "); Serial.print(httpCode); Serial.print(" "); Serial.println(payload);
 
   http.end();
   isGreenLedOn = turnOffLed(greenLed);
