@@ -76,8 +76,14 @@ HTTPClient http;
 WiFiClient wifiClient;
 
 void onButtonPush() {
+  Serial.println(WiFi.status());
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
+
   delay(200); // debounce to prevent double push
   isPushed = false;
+  isGreenLedOn = turnOnLed(greenLed);
   Serial.print("It's pushed: "); Serial.println(++i);
   
   http.begin(wifiClient, "http://192.168.1.117:8000/toggle");  //Specify request destination
@@ -87,6 +93,7 @@ void onButtonPush() {
   Serial.print("Got response: "); Serial.print(httpCode); Serial.println(payload);
 
   http.end();
+  isGreenLedOn = turnOffLed(greenLed);
 }
 
 void setup() {
