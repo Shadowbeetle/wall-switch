@@ -5,6 +5,9 @@
 int redLed = 5; //D1(gopi5)
 bool isRedLedOn = false;
 
+int greenLed = 14; //D5(gpio14)
+bool isGreenLedOn = false;
+
 int button = 4; //D2(gpio4)
 int buttonState = HIGH;
 bool isPushed = false;
@@ -52,6 +55,15 @@ void checkInitialWifiConnection() {
       Serial.print("IP address:\t");
       Serial.println(WiFi.localIP());         // Send the IP address of the ESP8266 to the computer
       i = 0;
+
+      for (int i = 0; i<3; i++) {
+        if (i > 0) { // so that we don't delay in the beginning and end unnecessarily
+          delay(200);
+        }
+        isGreenLedOn = turnOnLed(greenLed);
+        delay(200);
+        isGreenLedOn = turnOffLed(greenLed);
+      }
     }
   }
 }
@@ -80,6 +92,7 @@ void onButtonPush() {
 void setup() {
   Serial.begin(9600);         // Start the Serial communication to send messages to the computer
   pinMode(redLed, OUTPUT);
+  pinMode(greenLed, OUTPUT);
   pinMode(button, INPUT_PULLUP);
 
   attachInterrupt(digitalPinToInterrupt(button), handleButtonPushInterrupt, FALLING);
