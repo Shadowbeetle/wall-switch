@@ -2,66 +2,33 @@
 #include <esp8266httpclient.h>
 #include "secrets.h"
 
-// void setup() {
-//   Serial.begin(9600);         // Start the Serial communication to send messages to the computer
-  
-//   pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
-  
-//   delay(10);
-//   Serial.println('\n');
-  
-//   WiFi.begin(ssid, password);             // Connect to the network
-//   Serial.print("Connecting to ");
+int redLed = 5; //D1(gopi5)
+bool isRedLedOn = false;
 
-//   Serial.print(ssid); Serial.println(" ...");
-// }
-
-// bool isConnectionNotifiactionPrinted;
-// bool isLedOn = true;
-// unsigned long previousMillis = 0;
-// int i = 0;
-// const uint8_t OFF = HIGH;
-// const uint8_t ON = LOW;
-
-// void loop() { 
-//   unsigned long currentMillis = millis();
-
-//   if (WiFi.status() != WL_CONNECTED) {
-//     isConnectionNotifiactionPrinted = false;
-//     if (currentMillis - previousMillis >= 1000) {
-//       previousMillis = currentMillis;
-//       Serial.print(++i); Serial.print(' ');
-
-//       if (isLedOn) {
-//         isLedOn = false;
-//         digitalWrite(LED_BUILTIN, OFF);
-//       } else {
-//         isLedOn = true;
-//         digitalWrite(LED_BUILTIN, ON);
-//       }
-//     }
-//   } else {
-//     if (!isConnectionNotifiactionPrinted) {
-//       isLedOn = false;
-//       digitalWrite(LED_BUILTIN, OFF);
-//       i = 0;
-//       isConnectionNotifiactionPrinted = true;
-
-//       Serial.println('\n');
-//       Serial.println("Connection established!");  
-//       Serial.print("IP address:\t");
-//       Serial.println(WiFi.localIP());         // Send the IP address of the ESP8266 to the computer
-//     }
-//   }
-// }
-
-// int ledpin = 5; // D1(gpio5)
 int button = 4; //D2(gpio4)
 int buttonState = HIGH;
 bool isPushed = false;
 int i = 0;
 bool isConnectionNotifiactionPrinted;
 unsigned long previousMillis = 0;
+
+bool turnOnLed(int ledPin) {
+  digitalWrite(ledPin, HIGH);
+  return true;
+}
+
+bool turnOffLed(int ledPin) {
+  digitalWrite(ledPin, LOW);
+  return false;
+}
+
+bool toggleLed(int ledPin, bool isLedOn) {
+  if (isLedOn) {
+    return turnOffLed(ledPin);
+  } else {
+    return turnOnLed(ledPin);
+  }
+}
 
 void checkInitialWifiConnection() {
   unsigned long currentMillis = millis();
@@ -72,18 +39,12 @@ void checkInitialWifiConnection() {
       previousMillis = currentMillis;
       Serial.print(++i); Serial.print(' ');
 
-      // if (isLedOn) {
-      //   isLedOn = false;
-      //   digitalWrite(LED_BUILTIN, OFF);
-      // } else {
-      //   isLedOn = true;
-      //   digitalWrite(LED_BUILTIN, ON);
-      // }
+      isRedLedOn = toggleLed(redLed, isRedLedOn);
     }
   } else {
     if (!isConnectionNotifiactionPrinted) {
-      // isLedOn = false;
-      // digitalWrite(LED_BUILTIN, OFF);
+      isRedLedOn = turnOffLed(redLed);
+
       isConnectionNotifiactionPrinted = true;
 
       Serial.println('\n');
@@ -118,9 +79,9 @@ void onButtonPush() {
 
 void setup() {
   Serial.begin(9600);         // Start the Serial communication to send messages to the computer
-  // pinMode(ledpin, OUTPUT);
-  // pinMode(button, INPUT);
+  pinMode(redLed, OUTPUT);
   pinMode(button, INPUT_PULLUP);
+
   attachInterrupt(digitalPinToInterrupt(button), handleButtonPushInterrupt, FALLING);
 
   Serial.println('\n');
@@ -137,15 +98,4 @@ void loop() {
   if (isPushed && isConnectionNotifiactionPrinted) {
     onButtonPush();
   }
-  // buttonState = digitalRead(button); // put your main code here, to run repeatedly:
-  // if (buttonState == LOW) {
-  //   // digitalWrite(ledpin, HIGH); 
-  //   Serial.println("button pushed");
-  //   delay(200);
-  // }
-  // if (buttonState == HIGH) {
-  //   // digitalWrite(ledpin, LOW); 
-  //   Serial.println("button relased");
-  //   delay(200);
-  // }
 }
