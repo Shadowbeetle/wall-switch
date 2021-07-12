@@ -15,21 +15,21 @@ int i = 0;
 bool isConnectionNotifiactionPrinted;
 unsigned long previousMillis = 0;
 
-bool turnOnLed(int ledPin) {
+bool turnOnLed(int ledPin, bool* isLedOn) {
   digitalWrite(ledPin, HIGH);
-  return true;
+  *isLedOn = true;
 }
 
-bool turnOffLed(int ledPin) {
+bool turnOffLed(int ledPin, bool* isLedOn) {
   digitalWrite(ledPin, LOW);
-  return false;
+  *isLedOn = false;
 }
 
-bool toggleLed(int ledPin, bool isLedOn) {
+bool toggleLed(int ledPin, bool* isLedOn) {
   if (isLedOn) {
-    return turnOffLed(ledPin);
+    return turnOffLed(ledPin, isLedOn);
   } else {
-    return turnOnLed(ledPin);
+    return turnOnLed(ledPin, isLedOn);
   }
 }
 
@@ -42,11 +42,11 @@ void checkInitialWifiConnection() {
       previousMillis = currentMillis;
       Serial.print(++i); Serial.print(' ');
 
-      isRedLedOn = toggleLed(redLed, isRedLedOn);
+      toggleLed(redLed, &isRedLedOn);
     }
   } else {
     if (!isConnectionNotifiactionPrinted) {
-      isRedLedOn = turnOffLed(redLed);
+      turnOffLed(redLed, &isRedLedOn);
 
       isConnectionNotifiactionPrinted = true;
 
@@ -60,9 +60,9 @@ void checkInitialWifiConnection() {
         if (i > 0) { // so that we don't delay in the beginning and end unnecessarily
           delay(200);
         }
-        isGreenLedOn = turnOnLed(greenLed);
+        turnOnLed(greenLed, &isGreenLedOn);
         delay(200);
-        isGreenLedOn = turnOffLed(greenLed);
+        turnOffLed(greenLed, &isGreenLedOn);
       }
     }
   }
@@ -83,7 +83,7 @@ void onButtonPush() {
 
   delay(200); // debounce to prevent double push
   isPushed = false;
-  isGreenLedOn = turnOnLed(greenLed);
+  turnOnLed(greenLed, &isGreenLedOn);
   Serial.print("It's pushed: "); Serial.println(++i);
   
   http.begin(wifiClient, "http://192.168.1.117:8000/toggle");  //Specify request destination
@@ -91,15 +91,15 @@ void onButtonPush() {
   String payload = http.getString();
 
   if (httpCode != 200) {
-    isRedLedOn = turnOnLed(redLed);
+    turnOnLed(redLed, &isGreenLedOn);
   } else {
-    isRedLedOn = turnOffLed(redLed);
+    turnOffLed(redLed, &isGreenLedOn);
   }
 
   Serial.print("Got response: "); Serial.print(httpCode); Serial.print(" "); Serial.println(payload);
 
   http.end();
-  isGreenLedOn = turnOffLed(greenLed);
+  turnOffLed(greenLed, &isGreenLedOn);
 }
 
 void setup() {
