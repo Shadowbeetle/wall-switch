@@ -15,17 +15,17 @@ int i = 0;
 bool isConnectionNotifiactionPrinted;
 unsigned long previousMillis = 0;
 
-bool turnOnLed(int ledPin, bool* isLedOn) {
+void turnOnLed(int ledPin, bool* isLedOn) {
   digitalWrite(ledPin, HIGH);
   *isLedOn = true;
 }
 
-bool turnOffLed(int ledPin, bool* isLedOn) {
+void turnOffLed(int ledPin, bool* isLedOn) {
   digitalWrite(ledPin, LOW);
   *isLedOn = false;
 }
 
-bool toggleLed(int ledPin, bool* isLedOn) {
+void toggleLed(int ledPin, bool* isLedOn) {
   if (isLedOn) {
     return turnOffLed(ledPin, isLedOn);
   } else {
@@ -86,7 +86,7 @@ void onButtonPush() {
   turnOnLed(greenLed, &isGreenLedOn);
   Serial.print("It's pushed: "); Serial.println(++i);
   
-  http.begin(wifiClient, "http://192.168.1.117:8000/toggle");  //Specify request destination
+  http.begin(wifiClient, url);  //Specify request destination http://host:8000/toggle
   int httpCode = http.POST(""); 
   String payload = http.getString();
 
